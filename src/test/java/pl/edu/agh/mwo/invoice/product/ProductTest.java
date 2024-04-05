@@ -7,6 +7,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import pl.edu.agh.mwo.invoice.product.Product;
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 public class ProductTest {
     @Test
     public void testProductNameIsCorrect() {
