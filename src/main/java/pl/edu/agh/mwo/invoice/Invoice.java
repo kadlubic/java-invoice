@@ -19,7 +19,8 @@ public class Invoice {
         if (product == null || quantity <= 0) {
             throw new IllegalArgumentException();
         }
-        products.put(product, quantity);
+
+        products.merge(product, quantity, Integer::sum);
     }
 
     public BigDecimal getNetTotal() {
@@ -47,4 +48,40 @@ public class Invoice {
     public int getNumber() {
         return number;
     }
+
+    public String getProductList() {
+        StringBuilder productList = new StringBuilder();
+        productList.append("Numer faktury: ").append(getNumber()).append("\n");
+
+        Map<String, BigDecimal> productNameToTotalPrice = new HashMap<>();
+        for (Map.Entry<Product, Integer> entry : products.entrySet()) {
+            Product product = entry.getKey();
+            int quantity = entry.getValue();
+            BigDecimal totalPrice = product.getPrice().multiply(BigDecimal.valueOf(quantity));
+            String productName = product.getName();
+
+            productNameToTotalPrice.put(productName, totalPrice);
+        }
+
+        for (Map.Entry<String, BigDecimal> entry : productNameToTotalPrice.entrySet()) {
+            String productName = entry.getKey();
+            BigDecimal totalPrice = entry.getValue();
+            productList.append(productName).append("- ilość: ").append(getProductQuantity(productName)).append(" szt., cena: ").append(totalPrice).append(" PLN\n");
+        }
+
+        productList.append("Liczba pozycji: ").append(products.size());
+        return productList.toString();
+    }
+
+    private int getProductQuantity(String productName) {
+        int quantity = 0;
+        for (Map.Entry<Product, Integer> entry : products.entrySet()) {
+            Product product = entry.getKey();
+            if (product.getName().equals(productName)) {
+                quantity += entry.getValue();
+            }
+        }
+        return quantity;
+    }
 }
+

@@ -8,10 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import pl.edu.agh.mwo.invoice.Invoice;
-import pl.edu.agh.mwo.invoice.product.DairyProduct;
-import pl.edu.agh.mwo.invoice.product.OtherProduct;
-import pl.edu.agh.mwo.invoice.product.Product;
-import pl.edu.agh.mwo.invoice.product.TaxFreeProduct;
+import pl.edu.agh.mwo.invoice.product.*;
 
 public class InvoiceTest {
     private Invoice invoice;
@@ -149,5 +146,90 @@ public class InvoiceTest {
         int number1 = new Invoice().getNumber();
         int number2 = new Invoice().getNumber();
         Assert.assertThat(number1, Matchers.lessThan(number2));
+    }
+
+    @Test
+    public void testProductList() {
+        Product product1 = new TaxFreeProduct("Warzywa", new BigDecimal("12"));
+        Product product2 = new TaxFreeProduct("Owoce", new BigDecimal("10"));
+        int quantity1 = 2;
+        int quantity2 = 1;
+        invoice.addProduct(product1, quantity1);
+        invoice.addProduct(product2, quantity2);
+
+        String expectedProductList = "Numer faktury: " + invoice.getNumber() + "\n" +
+                "Warzywa- ilość: 2 szt., cena: 24 PLN\n" +
+                "Owoce- ilość: 1 szt., cena: 10 PLN\n" +
+                "Liczba pozycji: 2";
+
+        Assert.assertEquals(expectedProductList, invoice.getProductList());
+    }
+
+    @Test
+    public void testDoubleProducts() {
+        Product product1 = new TaxFreeProduct("Warzywa", new BigDecimal("12"));
+        Product product2 = new TaxFreeProduct("Owoce", new BigDecimal("10"));
+        Product product3 = new TaxFreeProduct("Warzywa", new BigDecimal("12"));
+        int quantity1 = 2;
+        int quantity2 = 1;
+        int quantity3 = 1;
+        invoice.addProduct(product1, quantity1);
+        invoice.addProduct(product2, quantity2);
+        invoice.addProduct(product3, quantity3);
+
+        String expectedProductList = "Numer faktury: " + invoice.getNumber() + "\n" +
+                "Warzywa- ilość: 3 szt., cena: 36 PLN\n" +
+                "Owoce- ilość: 1 szt., cena: 10 PLN\n" +
+                "Liczba pozycji: 2";
+
+        Assert.assertEquals(expectedProductList, invoice.getProductList());
+    }
+
+    @Test
+    public void testBottleOfWine() {
+        ProduktyAkcyzowe bottleOfWine = new ProduktyAkcyzowe("Butelka wina", new BigDecimal("20.50"), new BigDecimal("0.23"));
+
+        invoice.addProduct(bottleOfWine);
+
+        String expectedProductList = "Numer faktury: " + invoice.getNumber() + "\n" +
+                "Butelka wina- ilość: 1 szt., cena: 30.7750 PLN\n" +
+                "Liczba pozycji: 1";
+
+        Assert.assertEquals(expectedProductList, invoice.getProductList());
+    }
+
+    @Test
+    public void testFuelCanister() {
+        ProduktyAkcyzowe FuelCanister = new ProduktyAkcyzowe("Kanister paliwa", new BigDecimal("50"), new BigDecimal("0.23"));
+
+        invoice.addProduct(FuelCanister);
+
+        String expectedProductList = "Numer faktury: " + invoice.getNumber() + "\n" +
+                "Kanister paliwa- ilość: 1 szt., cena: 67.06 PLN\n" +
+                "Liczba pozycji: 1";
+
+        Assert.assertEquals(expectedProductList, invoice.getProductList());
+    }
+
+    @Test
+    public void testFakturka() {
+        Product product1 = new TaxFreeProduct("Warzywa", new BigDecimal("12"));
+        ProduktyAkcyzowe bottleOfWine = new ProduktyAkcyzowe("Butelka wina", new BigDecimal("20.50"), new BigDecimal("0.23"));
+        ProduktyAkcyzowe FuelCanister = new ProduktyAkcyzowe("Kanister paliwa", new BigDecimal("50"), new BigDecimal("0.23"));
+
+        int quantity1 = 1;
+        int quantity2 = 1;
+        int quantity3 = 2;
+        invoice.addProduct(product1, quantity1);
+        invoice.addProduct(bottleOfWine, quantity2);
+        invoice.addProduct(FuelCanister, quantity3);
+
+        String expectedProductList = "Numer faktury: " + invoice.getNumber() + "\n" +
+                "Warzywa- ilość: 1 szt., cena: 12 PLN\n" +
+                "Butelka wina- ilość: 1 szt., cena: 30.7750 PLN\n" +
+                "Kanister paliwa- ilość: 2 szt., cena: 134.12 PLN\n" +
+                "Liczba pozycji: 3";
+
+        Assert.assertEquals(expectedProductList, invoice.getProductList());
     }
 }
